@@ -10,6 +10,5 @@ func main() {
 	fmt.Scan(&c)
 	fmt.Scan(&d)
 
-	fmt.Println(a + b + c)
-	fmt.Println(d)
+	fmt.Printf("%d %s\n", a+b+c, d)
 }
