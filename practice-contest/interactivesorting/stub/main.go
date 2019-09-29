@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -10,12 +11,15 @@ import (
 func main() {
 	se := os.Stderr
 
+	n := flag.String("N", "5", "number of array")
+	q := flag.String("Q", "7", "number of query")
+
 	fmt.Fprintln(se, "stub start")
 
-	fmt.Fprintln(se, "read ./query.fifo")
-	fmt.Fprintln(se, "write ./result.fifo")
-	fp, err := os.OpenFile("./query.fifo", os.O_RDONLY|os.O_CREATE, os.ModeNamedPipe)
-	o, oe := os.OpenFile("./result.fifo", os.O_RDWR|os.O_CREATE, os.ModeNamedPipe)
+	fmt.Fprintln(se, "read ./sorter_to_stub.fifo")
+	fmt.Fprintln(se, "write ./stub_to_sorter.fifo")
+	fp, err := os.OpenFile("./sorter_to_stub.fifo", os.O_RDONLY|os.O_CREATE, os.ModeNamedPipe)
+	o, oe := os.OpenFile("./stub_to_sorter.fifo", os.O_WRONLY|os.O_CREATE, os.ModeNamedPipe)
 	if err != nil {
 		panic(err)
 	}
@@ -24,6 +28,9 @@ func main() {
 		panic(oe)
 	}
 	defer o.Close()
+
+	fmt.Fprintln(o, *n+" "+*q)
+	fmt.Fprintln(se, *n+" "+*q)
 
 	t := makeTable()
 
