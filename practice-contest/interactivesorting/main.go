@@ -90,7 +90,10 @@ func (s *sorter) execute() {
 	}
 
 	fmt.Fprintf(*s.logWriter, "total query count: %d\n", s.cnt)
-	fmt.Fprintf(*s.logWriter, "sorted: %q\n", sortedArray)
+	a := "!" + sortedArray[0] + sortedArray[1] + sortedArray[2] + sortedArray[3] + sortedArray[4] + "\n"
+	fmt.Fprintf(*s.logWriter, a)
+	s.writer.WriteString(a)
+	s.writer.Flush()
 }
 
 func (s *sorter) readNQ() (int, int) {

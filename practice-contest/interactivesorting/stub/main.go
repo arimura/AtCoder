@@ -41,7 +41,13 @@ func main() {
 			panic(err)
 		}
 		if n != 0 {
-			fmt.Fprintf(se, "query: %s", string(b))
+			in := string(b)
+			fmt.Fprintf(se, "in: %s", in)
+			if ([]rune(in))[0] == '!' {
+				fmt.Fprintf(se, "got answer!!!\n")
+				os.Exit(0)
+			}
+
 			lw := t[b[2]]
 			rw := t[b[4]]
 			var a string
