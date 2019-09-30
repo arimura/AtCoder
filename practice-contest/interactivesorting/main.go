@@ -12,6 +12,7 @@ type sorter struct {
 	writer    *bufio.Writer
 	scanner   *bufio.Scanner
 	logWriter *io.Writer
+	cnt       int
 }
 
 func newSorter(w io.Writer, r io.Reader, lw io.Writer) sorter {
@@ -19,6 +20,7 @@ func newSorter(w io.Writer, r io.Reader, lw io.Writer) sorter {
 		bufio.NewWriter(w),
 		bufio.NewScanner(r),
 		&lw,
+		0,
 	}
 }
 
@@ -30,19 +32,65 @@ func (s *sorter) execute() {
 	fmt.Fprintf(*s.logWriter, "initial array: %q\n", array)
 
 	//sort first two pairs
-	r1 := s.query(array[0], array[1])
-	if r1 == ">" {
-		t := array[0]
-		array[0] = array[1]
-		array[1] = t
+	if !s.isGreater(array[0], array[1]) {
+		array[0], array[1] = array[1], array[0]
 	}
-	r2 := s.query(array[2], array[3])
-	if r2 == ">" {
-		t := array[2]
-		array[2] = array[3]
-		array[3] = t
+
+	if !s.isGreater(array[2], array[3]) {
+		array[2], array[3] = array[3], array[2]
 	}
-	fmt.Println(array)
+
+	//compare greater elements of first two pairs
+	if !s.isGreater(array[1], array[3]) {
+		array[0], array[1], array[2], array[3] = array[2], array[3], array[0], array[1]
+	}
+
+	fmt.Fprintf(*s.logWriter, "result of 3rd querying: %q", array)
+
+	//array = [a,b,c,d,e] with a < b < d and c < d
+	//insert e int [a,b,d]
+	var tmpArray []string
+	var cElement = array[2]
+	if s.isGreater(array[4], array[1]) { //e < b
+		//e < b
+		if s.isGreater(array[4], array[0]) { //e < a
+			//e < a
+			//e, a, b, d (c: not determined)
+			tmpArray = []string{array[4], array[0], array[1], array[3]}
+		} else {
+			//a < e
+			//a, e, b ,d (c: not determined)
+			tmpArray = []string{array[0], array[4], array[1], array[3]}
+		}
+	} else {
+		//b < e
+		if s.isGreater(array[4], array[3]) { //e < d
+			//e < d
+			//a, b, e ,d (c: not determined)
+			tmpArray = []string{array[0], array[1], array[4], array[3]}
+		} else {
+			//d< e
+			//a, b, d, e (c: not determined)
+			tmpArray = []string{array[0], array[1], array[3], array[4]}
+		}
+	}
+	var sortedArray []string
+	if s.isGreater(cElement, tmpArray[1]) {
+		if s.isGreater(cElement, tmpArray[0]) {
+			sortedArray = []string{cElement, tmpArray[0], tmpArray[1], tmpArray[2], tmpArray[3]}
+		} else {
+			sortedArray = []string{tmpArray[0], cElement, tmpArray[1], tmpArray[2], tmpArray[3]}
+		}
+	} else {
+		if s.isGreater(cElement, tmpArray[2]) {
+			sortedArray = []string{tmpArray[0], tmpArray[1], cElement, tmpArray[2], tmpArray[3]}
+		} else {
+			sortedArray = []string{tmpArray[0], tmpArray[1], tmpArray[2], cElement, tmpArray[3]}
+		}
+	}
+
+	fmt.Fprintf(*s.logWriter, "total query count: %d\n", s.cnt)
+	fmt.Fprintf(*s.logWriter, "sorted: %q\n", sortedArray)
 }
 
 func (s *sorter) readNQ() (int, int) {
@@ -51,6 +99,10 @@ func (s *sorter) readNQ() (int, int) {
 	n, _ := strconv.Atoi(string(t[0]))
 	q, _ := strconv.Atoi(string(t[2]))
 	return n, q
+}
+
+func (s *sorter) isGreater(l, r string) bool {
+	return s.query(l, r) == "<"
 }
 
 func (s *sorter) query(l, r string) string {
@@ -62,6 +114,7 @@ func (s *sorter) query(l, r string) string {
 	s.scanner.Scan()
 	a := s.scanner.Text()
 	fmt.Fprintln(*s.logWriter, a)
+	s.cnt++
 	return a
 }
 
