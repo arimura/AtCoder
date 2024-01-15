@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "test_sample_data",
+			"type": "shell",
+			"command": "oj t -d ${fileDirname}/tests -c 'go run ${file}'"
+		}
+	]
+}
