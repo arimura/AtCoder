@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -18,8 +20,11 @@ func init() {
 func main() {
 	// 問題のcaseは標準入力で受け取る
 	inputLine := NextLine(sc)
+	i := strings.Split(inputLine, " ")
+	d, _ := strconv.Atoi(i[0])
+	n, _ := strconv.Atoi(i[1])
 
-	outPut:= inputLine
+	outPut := int(math.Pow(100, float64(d))) * n
 	// 標準出力で解答を出す
 	fmt.Println(outPut)
 }
@@ -29,4 +34,3 @@ func NextLine(sc *bufio.Scanner) string {
 	s := sc.Text()
 	return strings.TrimSpace(s)
 }
-
